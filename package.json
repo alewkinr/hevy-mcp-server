@@ -1,13 +1,15 @@
 {
 	"name": "hevy-mcp-server",
-	"version": "3.1.0",
-	"description": "A Model Context Protocol (MCP) server for the Hevy fitness tracking API, deployed on Cloudflare Workers with Hono framework",
+	"version": "4.0.0",
+	"description": "Single-user Docker MCP server for Hevy fitness tracking API",
+	"type": "module",
+	"main": "dist/index.js",
 	"keywords": [
 		"mcp",
 		"model-context-protocol",
 		"hevy",
 		"fitness",
-		"cloudflare-workers",
+		"docker",
 		"ai",
 		"claude"
 	],
@@ -20,34 +22,32 @@
 	},
 	"homepage": "https://github.com/tomtorggler/hevy-mcp-server#readme",
 	"scripts": {
-		"deploy": "wrangler deploy",
-		"dev": "wrangler dev --env dev --port 8787",
+		"build": "tsc",
+		"start": "node dist/index.js",
+		"dev": "tsx watch src/index.ts",
 		"format": "biome format --write",
 		"lint:fix": "biome lint --fix",
-		"start": "wrangler dev --env dev --port 8787",
-		"cf-typegen": "wrangler types",
 		"type-check": "tsc --noEmit",
 		"test": "vitest",
 		"test:watch": "vitest --watch",
 		"test:ui": "vitest --ui",
 		"test:coverage": "vitest --coverage",
-		"test:run": "vitest run"
+		"test:run": "vitest run",
+		"docker:build": "docker build -t hevy-mcp-server .",
+		"docker:run": "docker run -p 8787:8787 --env-file .env hevy-mcp-server",
+		"docker:compose": "docker-compose up --build"
 	},
 	"dependencies": {
-		"@cloudflare/workers-oauth-provider": "^0.0.11",
-		"@modelcontextprotocol/sdk": "1.20.0",
-		"agents": "^0.2.8",
-		"hono": "^4.10.1",
-		"octokit": "^5.0.4",
-		"zod": "^3.25.76"
+		"@modelcontextprotocol/sdk": "1.20.0"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.2.5",
-		"@cloudflare/workers-types": "^4.20251011.0",
 		"@types/node": "^24.7.2",
+		"@vitest/coverage-v8": "^3.2.4",
 		"@vitest/ui": "^3.2.4",
+		"tsx": "^4.19.2",
 		"typescript": "5.9.3",
 		"vitest": "^3.2.4",
-		"wrangler": "^4.45.0"
+		"zod": "^4.2.1"
 	}
 }

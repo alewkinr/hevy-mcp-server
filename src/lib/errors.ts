@@ -37,10 +37,10 @@ function getStatusMessage(status: number): string {
 
 /**
  * Format a Hevy API error into a user-friendly MCP tool response
- * 
+ *
  * @param error - The HevyApiError to format
  * @returns MCP tool response with actionable error information
- * 
+ *
  * @example
  * ```typescript
  * try {
@@ -162,10 +162,10 @@ export function formatHevyApiError(error: HevyApiError): McpToolResponse {
 
 /**
  * Format a Zod validation error into a user-friendly MCP tool response
- * 
+ *
  * @param error - The ZodError to format
  * @returns MCP tool response with specific validation error details
- * 
+ *
  * @example
  * ```typescript
  * try {
@@ -189,7 +189,7 @@ export function formatValidationError(error: ZodError): McpToolResponse {
 	// Group errors by path for better readability
 	const errorsByPath = new Map<string, string[]>();
 
-	for (const issue of error.errors) {
+	for (const issue of error.issues) {
 		const path = issue.path.length > 0 ? issue.path.join(".") : "root";
 		const messages = errorsByPath.get(path) || [];
 		messages.push(issue.message);
@@ -230,10 +230,10 @@ export function formatValidationError(error: ZodError): McpToolResponse {
 
 /**
  * Format a custom validation error into a user-friendly MCP tool response
- * 
+ *
  * @param error - The ValidationError to format
  * @returns MCP tool response with specific validation error details
- * 
+ *
  * @example
  * ```typescript
  * try {
@@ -293,7 +293,10 @@ export function formatValidationErrorMessage(error: ValidationError): McpToolRes
 		parts.push("  - Verify exercise template IDs are valid");
 	}
 	// Set errors
-	else if (message.includes("set") && (message.includes("required") || message.includes("at least one"))) {
+	else if (
+		message.includes("set") &&
+		(message.includes("required") || message.includes("at least one"))
+	) {
 		parts.push("  - Include at least one set for each exercise");
 		parts.push("  - Verify the sets array is not empty");
 	} else if (message.includes("cannot be negative")) {
@@ -331,10 +334,10 @@ export function formatValidationErrorMessage(error: ValidationError): McpToolRes
 
 /**
  * Central error handler that routes errors to appropriate formatters
- * 
+ *
  * @param error - Any error object
  * @returns MCP tool response with formatted error information
- * 
+ *
  * @example
  * ```typescript
  * try {
@@ -384,4 +387,3 @@ export function handleError(error: unknown): McpToolResponse {
 		isError: true,
 	};
 }
-

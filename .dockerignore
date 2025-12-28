@@ -1,0 +1,16 @@
+node_modules
+dist
+.wrangler
+.dev.vars
+.env
+*.log
+test
+.git
+.github
+README.md
+CLAUDE.md
+wrangler.jsonc
+worker-configuration.d.ts
+.biomejs.json
+coverage
+.vitest

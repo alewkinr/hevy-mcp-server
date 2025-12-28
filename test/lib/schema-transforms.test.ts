@@ -1,13 +1,13 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
-	transformWorkoutToAPI,
-	transformRoutineToAPI,
-	transformExerciseTemplateToAPI,
-	transformRoutineFolderToAPI,
-	PostWorkoutsRequestBodySchema,
-	PostRoutinesRequestBodySchema,
 	PostExerciseTemplateRequestBodySchema,
 	PostRoutineFolderRequestBodySchema,
+	PostRoutinesRequestBodySchema,
+	PostWorkoutsRequestBodySchema,
+	transformExerciseTemplateToAPI,
+	transformRoutineFolderToAPI,
+	transformRoutineToAPI,
+	transformWorkoutToAPI,
 } from "../../src/lib/schemas.js";
 
 /**
@@ -57,9 +57,7 @@ describe("Schema Transforms - API Output Validation", () => {
 			// Verify exercise does NOT have index or title fields (API doesn't accept them)
 			expect(output.workout.exercises[0]).not.toHaveProperty("index");
 			expect(output.workout.exercises[0]).not.toHaveProperty("title");
-			expect(output.workout.exercises[0]).toHaveProperty(
-				"exercise_template_id"
-			);
+			expect(output.workout.exercises[0]).toHaveProperty("exercise_template_id");
 		});
 
 		it("should NOT add index field to sets", () => {
@@ -179,7 +177,7 @@ describe("Schema Transforms - API Output Validation", () => {
 				title: "Test Workout",
 				start_time: "2024-01-15T10:00:00Z",
 				end_time: "2024-01-15T11:00:00Z",
-				is_private: false,  // Required by API
+				is_private: false, // Required by API
 				exercises: [
 					{
 						title: "Bench Press",
@@ -212,7 +210,7 @@ describe("Schema Transforms - API Output Validation", () => {
 				title: "Test Workout",
 				start_time: "2024-01-15T10:00:00Z",
 				end_time: "2024-01-15T11:00:00Z",
-				is_private: false,  // Required by API
+				is_private: false, // Required by API
 				exercises: [
 					{
 						title: "Bench Press",
@@ -225,9 +223,7 @@ describe("Schema Transforms - API Output Validation", () => {
 					{
 						title: "Squat",
 						exercise_template_id: "456",
-						sets: [
-							{ type: "normal" as const, weight_kg: 140, reps: 8 },
-						],
+						sets: [{ type: "normal" as const, weight_kg: 140, reps: 8 }],
 					},
 				],
 			};
@@ -465,7 +461,7 @@ describe("Schema Transforms - API Output Validation", () => {
 				start_time: "2024-01-15T10:00:00Z",
 				end_time: "2024-01-15T11:00:00Z",
 				routine_id: null,
-				is_private: false,  // Required by API
+				is_private: false, // Required by API
 				exercises: [
 					{
 						title: "Bench Press",
@@ -499,7 +495,7 @@ describe("Schema Transforms - API Output Validation", () => {
 				title: "Empty Workout",
 				start_time: "2024-01-15T10:00:00Z",
 				end_time: "2024-01-15T11:00:00Z",
-				is_private: false,  // Required by API
+				is_private: false, // Required by API
 				exercises: [],
 			};
 
@@ -515,7 +511,7 @@ describe("Schema Transforms - API Output Validation", () => {
 		it("should remove empty string notes (v2.2.0+)", () => {
 			const input = {
 				title: "Test Workout",
-				description: "",  // Empty string
+				description: "", // Empty string
 				start_time: "2024-01-15T10:00:00Z",
 				end_time: "2024-01-15T11:00:00Z",
 				is_private: false,
@@ -523,7 +519,7 @@ describe("Schema Transforms - API Output Validation", () => {
 					{
 						title: "Bench Press",
 						exercise_template_id: "123",
-						notes: "",  // Empty string - should be removed
+						notes: "", // Empty string - should be removed
 						sets: [
 							{
 								type: "normal" as const,
@@ -558,14 +554,14 @@ describe("Schema Transforms - API Output Validation", () => {
 				is_private: false,
 				exercises: [
 					{
-						index: 0,  // Extra field from GET
-						id: "exercise-456",  // Extra field from GET
+						index: 0, // Extra field from GET
+						id: "exercise-456", // Extra field from GET
 						title: "Bench Press",
 						exercise_template_id: "123",
-						notes: "",  // Empty notes
+						notes: "", // Empty notes
 						sets: [
 							{
-								index: 0,  // Extra field from GET
+								index: 0, // Extra field from GET
 								type: "normal" as const,
 								weight_kg: 100,
 								reps: 10,
