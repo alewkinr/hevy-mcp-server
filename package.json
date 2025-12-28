@@ -1,53 +1,53 @@
 {
-	"name": "hevy-mcp-server",
-	"version": "4.0.0",
-	"description": "Single-user Docker MCP server for Hevy fitness tracking API",
-	"type": "module",
-	"main": "dist/index.js",
-	"keywords": [
-		"mcp",
-		"model-context-protocol",
-		"hevy",
-		"fitness",
-		"docker",
-		"ai",
-		"claude"
-	],
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/tomtorggler/hevy-mcp-server.git"
-	},
-	"bugs": {
-		"url": "https://github.com/tomtorggler/hevy-mcp-server/issues"
-	},
-	"homepage": "https://github.com/tomtorggler/hevy-mcp-server#readme",
-	"scripts": {
-		"build": "tsc",
-		"start": "node dist/index.js",
-		"dev": "tsx watch src/index.ts",
-		"format": "biome format --write",
-		"lint:fix": "biome lint --fix",
-		"type-check": "tsc --noEmit",
-		"test": "vitest",
-		"test:watch": "vitest --watch",
-		"test:ui": "vitest --ui",
-		"test:coverage": "vitest --coverage",
-		"test:run": "vitest run",
-		"docker:build": "docker build -t hevy-mcp-server .",
-		"docker:run": "docker run -p 8787:8787 --env-file .env hevy-mcp-server",
-		"docker:compose": "docker-compose up --build"
-	},
-	"dependencies": {
-		"@modelcontextprotocol/sdk": "1.20.0"
-	},
-	"devDependencies": {
-		"@biomejs/biome": "^2.2.5",
-		"@types/node": "^24.7.2",
-		"@vitest/coverage-v8": "^3.2.4",
-		"@vitest/ui": "^3.2.4",
-		"tsx": "^4.19.2",
-		"typescript": "5.9.3",
-		"vitest": "^3.2.4",
-		"zod": "^4.2.1"
-	}
+  "name": "hevy-mcp-server",
+  "version": "4.0.0",
+  "description": "Single-user Docker MCP server for Hevy fitness tracking API",
+  "type": "module",
+  "main": "dist/index.js",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "hevy",
+    "fitness",
+    "docker",
+    "ai",
+    "claude"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tomtorggler/hevy-mcp-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tomtorggler/hevy-mcp-server/issues"
+  },
+  "homepage": "https://github.com/tomtorggler/hevy-mcp-server#readme",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/index.ts",
+    "format": "biome format --write",
+    "lint:fix": "biome lint --fix",
+    "type-check": "tsc --noEmit",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "test:run": "vitest run",
+    "docker:build": "docker build -t hevy-mcp-server .",
+    "docker:run": "docker run -d -p 8787:8787 --env-file .env --name hevy-mcp hevy-mcp-server",
+    "docker:compose": "docker-compose up -d"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.20.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.2.5",
+    "@types/node": "^24.7.2",
+    "@vitest/coverage-v8": "^3.2.4",
+    "@vitest/ui": "^3.2.4",
+    "tsx": "^4.19.2",
+    "typescript": "5.9.3",
+    "vitest": "^3.2.4",
+    "zod": "^4.2.1"
+  }
 }

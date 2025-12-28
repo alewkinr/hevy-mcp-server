@@ -1,0 +1,3 @@
+{$DUCKDNS_DOMAIN}.duckdns.org {
+    reverse_proxy hevy-mcp:8787
+}
