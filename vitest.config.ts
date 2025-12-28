@@ -1,21 +1,29 @@
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
-  test: {
-    globals: true,
-    environment: 'node',
-    setupFiles: ['./test/setup.ts'],
-    coverage: {
-      provider: 'v8',
-      reporter: ['text', 'html', 'json'],
-      exclude: [
-        'test/**',
-        'dist/**',
-        '**/*.config.ts',
-        '**/*.d.ts',
-      ],
-    },
-    include: ['test/**/*.test.ts'],
-    exclude: ['node_modules', 'dist'],
-  },
+	test: {
+		coverage: {
+			provider: "v8",
+			reporter: ["text", "json", "html"],
+			exclude: [
+				"**/node_modules/**",
+				"**/dist/**",
+				"**/test/**",
+				"**/*.test.ts",
+				"**/*.config.ts",
+				// Exclude entry points and integration code from coverage
+				// These are tested via integration/manual testing
+				"src/index.ts", // HTTP server entry point
+				"src/routes/mcp.ts", // MCP transport setup (integration layer)
+				"src/mcp-server.ts", // MCP server with 17 tools - tested via integration tests
+			],
+			// Set thresholds for business logic only
+			thresholds: {
+				statements: 80,
+				branches: 80,
+				functions: 80,
+				lines: 80,
+			},
+		},
+	},
 });

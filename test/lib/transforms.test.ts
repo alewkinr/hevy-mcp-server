@@ -1,16 +1,16 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
-	ValidationError,
-	validatePagination,
-	validateISO8601Date,
-	validateRPE,
-	validateWorkoutExercises,
-	validateRoutineExercises,
-	validateWorkoutData,
-	validateRoutineData,
-	validateExerciseTemplate,
-	PAGINATION_LIMITS,
 	createValidatedPagination,
+	PAGINATION_LIMITS,
+	ValidationError,
+	validateExerciseTemplate,
+	validateISO8601Date,
+	validatePagination,
+	validateRoutineData,
+	validateRoutineExercises,
+	validateRPE,
+	validateWorkoutData,
+	validateWorkoutExercises,
 } from "../../src/lib/transforms.js";
 
 describe("validatePagination", () => {
@@ -22,49 +22,35 @@ describe("validatePagination", () => {
 
 	it("should throw ValidationError for page < 1", () => {
 		expect(() => validatePagination(0, 10, 10)).toThrow(ValidationError);
-		expect(() => validatePagination(-1, 10, 10)).toThrow(
-			"Page must be 1 or greater"
-		);
+		expect(() => validatePagination(-1, 10, 10)).toThrow("Page must be 1 or greater");
 	});
 
 	it("should throw ValidationError for pageSize < 1", () => {
 		expect(() => validatePagination(1, 0, 10)).toThrow(ValidationError);
-		expect(() => validatePagination(1, -1, 10)).toThrow(
-			"Page size must be at least 1"
-		);
+		expect(() => validatePagination(1, -1, 10)).toThrow("Page size must be at least 1");
 	});
 
 	it("should throw ValidationError for pageSize exceeding max", () => {
 		expect(() => validatePagination(1, 11, 10)).toThrow(ValidationError);
-		expect(() => validatePagination(1, 101, 100)).toThrow(
-			"Page size cannot exceed"
-		);
+		expect(() => validatePagination(1, 101, 100)).toThrow("Page size cannot exceed");
 	});
 });
 
 describe("validateISO8601Date", () => {
 	it("should pass for valid ISO 8601 dates", () => {
-		expect(() =>
-			validateISO8601Date("2024-01-15T10:00:00Z", "testDate")
-		).not.toThrow();
-		expect(() =>
-			validateISO8601Date("2024-12-31T23:59:59Z", "testDate")
-		).not.toThrow();
-		expect(() =>
-			validateISO8601Date("2024-01-01T00:00:00+05:00", "testDate")
-		).not.toThrow();
+		expect(() => validateISO8601Date("2024-01-15T10:00:00Z", "testDate")).not.toThrow();
+		expect(() => validateISO8601Date("2024-12-31T23:59:59Z", "testDate")).not.toThrow();
+		expect(() => validateISO8601Date("2024-01-01T00:00:00+05:00", "testDate")).not.toThrow();
 	});
 
 	it("should throw ValidationError for invalid date format", () => {
-		expect(() =>
-			validateISO8601Date("2024-13-01T10:00:00Z", "testDate")
-		).toThrow(ValidationError);
+		expect(() => validateISO8601Date("2024-13-01T10:00:00Z", "testDate")).toThrow(
+			ValidationError,
+		);
 		expect(() => validateISO8601Date("not-a-date", "testDate")).toThrow(
-			"must be in ISO 8601 format"
+			"must be in ISO 8601 format",
 		);
-		expect(() => validateISO8601Date("2024/01/15", "testDate")).toThrow(
-			ValidationError
-		);
+		expect(() => validateISO8601Date("2024/01/15", "testDate")).toThrow(ValidationError);
 	});
 
 	// Note: JavaScript Date is lenient and accepts "2024-02-30" as valid (it becomes 2024-03-01)
@@ -109,15 +95,11 @@ describe("validateWorkoutExercises", () => {
 	});
 
 	it("should throw ValidationError for non-array input", () => {
-		expect(() => validateWorkoutExercises({} as any)).toThrow(
-			"Exercises must be an array"
-		);
+		expect(() => validateWorkoutExercises({} as any)).toThrow("Exercises must be an array");
 	});
 
 	it("should throw ValidationError for empty exercises array", () => {
-		expect(() => validateWorkoutExercises([])).toThrow(
-			"At least one exercise is required"
-		);
+		expect(() => validateWorkoutExercises([])).toThrow("At least one exercise is required");
 	});
 
 	it("should throw ValidationError for exercise missing title", () => {
@@ -128,7 +110,7 @@ describe("validateWorkoutExercises", () => {
 			},
 		];
 		expect(() => validateWorkoutExercises(exercises as any)).toThrow(
-			"missing required field: title"
+			"missing required field: title",
 		);
 	});
 
@@ -140,7 +122,7 @@ describe("validateWorkoutExercises", () => {
 			},
 		];
 		expect(() => validateWorkoutExercises(exercises as any)).toThrow(
-			"missing required field: exercise_template_id"
+			"missing required field: exercise_template_id",
 		);
 	});
 
@@ -152,9 +134,7 @@ describe("validateWorkoutExercises", () => {
 				sets: [],
 			},
 		];
-		expect(() => validateWorkoutExercises(exercises)).toThrow(
-			"must have at least one set"
-		);
+		expect(() => validateWorkoutExercises(exercises)).toThrow("must have at least one set");
 	});
 
 	it("should throw ValidationError for invalid RPE in set", () => {
@@ -176,9 +156,7 @@ describe("validateWorkoutExercises", () => {
 				sets: [{ type: "normal", weight_kg: -100, reps: 10 }],
 			},
 		];
-		expect(() => validateWorkoutExercises(exercises)).toThrow(
-			"weight_kg cannot be negative"
-		);
+		expect(() => validateWorkoutExercises(exercises)).toThrow("weight_kg cannot be negative");
 	});
 });
 
@@ -203,7 +181,7 @@ describe("validateRoutineExercises", () => {
 			},
 		];
 		expect(() => validateRoutineExercises(exercises)).toThrow(
-			"rest_seconds cannot be negative"
+			"rest_seconds cannot be negative",
 		);
 	});
 
@@ -221,7 +199,7 @@ describe("validateRoutineExercises", () => {
 			},
 		];
 		expect(() => validateRoutineExercises(exercises)).toThrow(
-			"rep_range.start cannot be greater than rep_range.end"
+			"rep_range.start cannot be greater than rep_range.end",
 		);
 	});
 
@@ -239,7 +217,7 @@ describe("validateRoutineExercises", () => {
 			},
 		];
 		expect(() => validateRoutineExercises(exercises)).toThrow(
-			"rep_range.start cannot be negative"
+			"rep_range.start cannot be negative",
 		);
 	});
 });
@@ -290,9 +268,7 @@ describe("validateWorkoutData", () => {
 				},
 			],
 		};
-		expect(() => validateWorkoutData(workout)).toThrow(
-			"end_time must be after start_time"
-		);
+		expect(() => validateWorkoutData(workout)).toThrow("end_time must be after start_time");
 	});
 });
 
@@ -321,7 +297,7 @@ describe("validateRoutineData", () => {
 			],
 		};
 		expect(() => validateRoutineData(routine)).toThrow(
-			"Routine title is required and cannot be empty"
+			"Routine title is required and cannot be empty",
 		);
 	});
 
@@ -336,7 +312,7 @@ describe("validateRoutineData", () => {
 			],
 		};
 		expect(() => validateRoutineData(routine)).toThrow(
-			"Routine title is required and cannot be empty"
+			"Routine title is required and cannot be empty",
 		);
 	});
 });
@@ -360,7 +336,7 @@ describe("validateExerciseTemplate", () => {
 			muscle_group: "chest",
 		};
 		expect(() => validateExerciseTemplate(template)).toThrow(
-			"Exercise template title is required"
+			"Exercise template title is required",
 		);
 	});
 
@@ -371,7 +347,7 @@ describe("validateExerciseTemplate", () => {
 			muscle_group: "chest",
 		};
 		expect(() => validateExerciseTemplate(template as any)).toThrow(
-			"Exercise type is required"
+			"Exercise type is required",
 		);
 	});
 
@@ -382,7 +358,7 @@ describe("validateExerciseTemplate", () => {
 			muscle_group: "chest",
 		};
 		expect(() => validateExerciseTemplate(template as any)).toThrow(
-			"Equipment category is required"
+			"Equipment category is required",
 		);
 	});
 
@@ -392,9 +368,7 @@ describe("validateExerciseTemplate", () => {
 			exercise_type: "weight_reps",
 			equipment_category: "dumbbell",
 		};
-		expect(() => validateExerciseTemplate(template as any)).toThrow(
-			"Muscle group is required"
-		);
+		expect(() => validateExerciseTemplate(template as any)).toThrow("Muscle group is required");
 	});
 });
 
@@ -415,12 +389,7 @@ describe("createValidatedPagination", () => {
 	});
 
 	it("should throw ValidationError for invalid parameters", () => {
-		expect(() => createValidatedPagination(0, 10, 10)).toThrow(
-			ValidationError
-		);
-		expect(() => createValidatedPagination(1, 11, 10)).toThrow(
-			ValidationError
-		);
+		expect(() => createValidatedPagination(0, 10, 10)).toThrow(ValidationError);
+		expect(() => createValidatedPagination(1, 11, 10)).toThrow(ValidationError);
 	});
 });
-

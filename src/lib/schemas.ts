@@ -111,7 +111,11 @@ export type WorkoutSet = z.infer<typeof WorkoutSetSchema>;
 export const WorkoutExerciseSchema = z.object({
 	title: z.string().describe("Exercise name (from exercise template)"),
 	exercise_template_id: z.string().describe("Exercise template ID"),
-	superset_id: z.number().optional().nullable().describe("Superset ID (null if not in a superset)"),
+	superset_id: z
+		.number()
+		.optional()
+		.nullable()
+		.describe("Superset ID (null if not in a superset)"),
 	notes: z.string().optional().nullable().describe("Notes for this exercise"),
 	sets: z.array(WorkoutSetSchema).describe("Sets performed in this exercise"),
 });
@@ -125,8 +129,15 @@ export const CreateWorkoutSchema = z.object({
 	description: z.string().optional().nullable().describe("Workout description"),
 	start_time: z.string().describe("Start time (ISO 8601 format, e.g., 2024-01-15T10:00:00Z)"),
 	end_time: z.string().describe("End time (ISO 8601 format, e.g., 2024-01-15T11:30:00Z)"),
-	routine_id: z.string().optional().nullable().describe("Optional routine ID that this workout belongs to"),
-	is_private: z.boolean().default(false).describe("Whether the workout is private (default: false)"),
+	routine_id: z
+		.string()
+		.optional()
+		.nullable()
+		.describe("Optional routine ID that this workout belongs to"),
+	is_private: z
+		.boolean()
+		.default(false)
+		.describe("Whether the workout is private (default: false)"),
 	exercises: z.array(WorkoutExerciseSchema).describe("Exercises in the workout"),
 });
 export type CreateWorkout = z.infer<typeof CreateWorkoutSchema>;
@@ -162,7 +173,9 @@ export const RoutineSetSchema = z.object({
 	distance_meters: z.number().optional().nullable().describe("Distance in meters"),
 	duration_seconds: z.number().optional().nullable().describe("Duration in seconds"),
 	custom_metric: z.number().optional().nullable().describe("Custom metric (for steps/floors)"),
-	rep_range: RepRangeSchema.optional().nullable().describe("Range of reps for the set (e.g., 8-12 reps)"),
+	rep_range: RepRangeSchema.optional()
+		.nullable()
+		.describe("Range of reps for the set (e.g., 8-12 reps)"),
 });
 export type RoutineSet = z.infer<typeof RoutineSetSchema>;
 
@@ -173,7 +186,11 @@ export type RoutineSet = z.infer<typeof RoutineSetSchema>;
  */
 export const RoutineExerciseSchema = z.object({
 	exercise_template_id: z.string().describe("Exercise template ID"),
-	superset_id: z.number().optional().nullable().describe("Superset ID (null if not in a superset)"),
+	superset_id: z
+		.number()
+		.optional()
+		.nullable()
+		.describe("Superset ID (null if not in a superset)"),
 	rest_seconds: z.number().optional().nullable().describe("Rest time in seconds between sets"),
 	notes: z.string().optional().nullable().describe("Notes for this exercise"),
 	sets: z.array(RoutineSetSchema).describe("Sets for this exercise"),
@@ -185,7 +202,11 @@ export type RoutineExercise = z.infer<typeof RoutineExerciseSchema>;
  */
 export const CreateRoutineSchema = z.object({
 	title: z.string().describe("Title of the routine"),
-	folder_id: z.number().optional().nullable().describe("Folder ID (null for default 'My Routines' folder)"),
+	folder_id: z
+		.number()
+		.optional()
+		.nullable()
+		.describe("Folder ID (null for default 'My Routines' folder)"),
 	notes: z.string().optional().describe("Notes for the routine"),
 	exercises: z.array(RoutineExerciseSchema).describe("Exercises in the routine"),
 });
@@ -273,7 +294,7 @@ export const PostWorkoutsRequestBodySchema = z.object({
 		start_time: z.string(),
 		end_time: z.string(),
 		routine_id: z.string().optional().nullable(),
-		is_private: z.boolean(),  // REQUIRED by actual API
+		is_private: z.boolean(), // REQUIRED by actual API
 		exercises: z.array(WorkoutExerciseAPISchema),
 	}),
 });
@@ -293,10 +314,13 @@ export const RoutineSetAPISchema = z.object({
 	distance_meters: z.number().optional().nullable(),
 	duration_seconds: z.number().optional().nullable(),
 	custom_metric: z.number().optional().nullable(),
-	rep_range: z.object({
-		start: z.number().optional().nullable(),
-		end: z.number().optional().nullable(),
-	}).optional().nullable(),
+	rep_range: z
+		.object({
+			start: z.number().optional().nullable(),
+			end: z.number().optional().nullable(),
+		})
+		.optional()
+		.nullable(),
 });
 
 /**
@@ -367,7 +391,7 @@ export const PostRoutineFolderRequestBodySchema = z.object({
  */
 function cleanValue<T>(value: T | null | undefined): T | undefined {
 	if (value === null) return undefined;
-	if (typeof value === 'string' && value.trim() === '') return undefined;
+	if (typeof value === "string" && value.trim() === "") return undefined;
 	return value as T | undefined;
 }
 
@@ -423,20 +447,24 @@ export function transformWorkoutToAPI(workout: CreateWorkout) {
 			end_time: workout.end_time,
 			routine_id: cleanValue(workout.routine_id),
 			is_private: workout.is_private,
-			exercises: workout.exercises.map((ex) => removeUndefined({
-				exercise_template_id: ex.exercise_template_id,
-				superset_id: cleanValue(ex.superset_id),
-				notes: cleanValue(ex.notes),
-				sets: ex.sets.map((set) => removeUndefined({
-					type: set.type,
-					weight_kg: cleanValue(set.weight_kg),
-					reps: cleanValue(set.reps),
-					distance_meters: cleanValue(set.distance_meters),
-					duration_seconds: cleanValue(set.duration_seconds),
-					custom_metric: cleanValue(set.custom_metric),
-					rpe: cleanValue(set.rpe),
-				})),
-			})),
+			exercises: workout.exercises.map((ex) =>
+				removeUndefined({
+					exercise_template_id: ex.exercise_template_id,
+					superset_id: cleanValue(ex.superset_id),
+					notes: cleanValue(ex.notes),
+					sets: ex.sets.map((set) =>
+						removeUndefined({
+							type: set.type,
+							weight_kg: cleanValue(set.weight_kg),
+							reps: cleanValue(set.reps),
+							distance_meters: cleanValue(set.distance_meters),
+							duration_seconds: cleanValue(set.duration_seconds),
+							custom_metric: cleanValue(set.custom_metric),
+							rpe: cleanValue(set.rpe),
+						}),
+					),
+				}),
+			),
 		}),
 	};
 }
@@ -473,28 +501,34 @@ export function transformRoutineToAPI(routine: CreateRoutine | UpdateRoutine) {
 	const baseRoutine = removeUndefined({
 		title: routine.title,
 		notes: cleanValue(routine.notes),
-		exercises: routine.exercises.map((ex) => removeUndefined({
-			exercise_template_id: ex.exercise_template_id,
-			superset_id: cleanValue(ex.superset_id),
-			rest_seconds: cleanValue(ex.rest_seconds),
-			notes: cleanValue(ex.notes),
-			sets: ex.sets.map((set) => removeUndefined({
-				type: set.type,
-				weight_kg: cleanValue(set.weight_kg),
-				reps: cleanValue(set.reps),
-				distance_meters: cleanValue(set.distance_meters),
-				duration_seconds: cleanValue(set.duration_seconds),
-				custom_metric: cleanValue(set.custom_metric),
-				rep_range: set.rep_range ? removeUndefined({
-					start: cleanValue(set.rep_range.start),
-					end: cleanValue(set.rep_range.end),
-				}) : undefined,
-			})),
-		})),
+		exercises: routine.exercises.map((ex) =>
+			removeUndefined({
+				exercise_template_id: ex.exercise_template_id,
+				superset_id: cleanValue(ex.superset_id),
+				rest_seconds: cleanValue(ex.rest_seconds),
+				notes: cleanValue(ex.notes),
+				sets: ex.sets.map((set) =>
+					removeUndefined({
+						type: set.type,
+						weight_kg: cleanValue(set.weight_kg),
+						reps: cleanValue(set.reps),
+						distance_meters: cleanValue(set.distance_meters),
+						duration_seconds: cleanValue(set.duration_seconds),
+						custom_metric: cleanValue(set.custom_metric),
+						rep_range: set.rep_range
+							? removeUndefined({
+									start: cleanValue(set.rep_range.start),
+									end: cleanValue(set.rep_range.end),
+								})
+							: undefined,
+					}),
+				),
+			}),
+		),
 	});
 
 	// Add folder_id only for CreateRoutine
-	if ('folder_id' in routine) {
+	if ("folder_id" in routine) {
 		return {
 			routine: removeUndefined({
 				...baseRoutine,
@@ -508,10 +542,10 @@ export function transformRoutineToAPI(routine: CreateRoutine | UpdateRoutine) {
 
 /**
  * Transform exercise template data to API format (wraps in exercise object)
- * 
+ *
  * @param template - Exercise template data in snake_case format
  * @returns Exercise template data formatted for the Hevy API
- * 
+ *
  * @example
  * ```typescript
  * const template = {
@@ -539,10 +573,10 @@ export function transformExerciseTemplateToAPI(template: CreateExerciseTemplate)
 
 /**
  * Transform routine folder data to API format (wraps in routine_folder object)
- * 
+ *
  * @param folder - Routine folder data in snake_case format
  * @returns Routine folder data formatted for the Hevy API
- * 
+ *
  * @example
  * ```typescript
  * const folder = {

@@ -1,35 +1,31 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { HevyClient } from "../../src/lib/client.js";
-import { mockFetchSuccess, mockFetchError } from "../setup.js";
-import {
-	mockWorkout,
-	mockWorkoutsList,
-	mockWorkoutEvents,
-} from "../fixtures/workouts.js";
 import { handleError } from "../../src/lib/errors.js";
 import {
-	validatePagination,
-	validateISO8601Date,
-	validateWorkoutData,
-	validateRoutineData,
-	validateExerciseTemplate,
-	PAGINATION_LIMITS,
-} from "../../src/lib/transforms.js";
-import {
-	transformWorkoutToAPI,
-	transformRoutineToAPI,
 	transformExerciseTemplateToAPI,
 	transformRoutineFolderToAPI,
+	transformRoutineToAPI,
+	transformWorkoutToAPI,
 } from "../../src/lib/schemas.js";
+import {
+	PAGINATION_LIMITS,
+	validateExerciseTemplate,
+	validateISO8601Date,
+	validatePagination,
+	validateRoutineData,
+	validateWorkoutData,
+} from "../../src/lib/transforms.js";
+import { mockWorkout, mockWorkoutEvents, mockWorkoutsList } from "../fixtures/workouts.js";
+import { mockFetchError, mockFetchSuccess } from "../setup.js";
 
 /**
  * Integration tests for MCP tools
- * 
+ *
  * These tests verify the end-to-end flow that users will experience:
  * 1. Valid inputs → successful responses
  * 2. Invalid inputs → proper error messages
  * 3. Edge cases → appropriate handling
- * 
+ *
  * Note: Since MCP tools are Cloudflare Workers Durable Objects, we test
  * the underlying logic (client calls, validation, error handling, transformations)
  * that powers each tool rather than the tool handlers themselves.
@@ -543,7 +539,10 @@ describe("MCP Tools Integration Tests", () => {
 			mockFetchSuccess(mockTemplates);
 
 			validatePagination(1, 20, PAGINATION_LIMITS.EXERCISE_TEMPLATES);
-			const templates = await client.getExerciseTemplates({ page: 1, pageSize: 20 });
+			const templates = await client.getExerciseTemplates({
+				page: 1,
+				pageSize: 20,
+			});
 
 			expect(templates.exercise_templates).toHaveLength(1);
 		});
@@ -770,8 +769,10 @@ describe("MCP Tools Integration Tests", () => {
 				expect.fail("Should have thrown");
 			} catch (error) {
 				const result = handleError(error);
-			expect(result.content[0].text).toContain("❌ Unauthorized - Invalid API key");
-			expect(result.content[0].text).toContain("Verify your Hevy API key is configured at /setup");
+				expect(result.content[0].text).toContain("❌ Unauthorized - Invalid API key");
+				expect(result.content[0].text).toContain(
+					"Verify your Hevy API key is configured at /setup",
+				);
 				expect(result.isError).toBe(true);
 			}
 		});

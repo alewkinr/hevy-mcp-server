@@ -1,64 +1,42 @@
-import { Hono } from "hono";
-import { bearerAuth } from "../middleware/auth.js";
-import type { Env, Variables } from "../app.js";
+/**
+ * MCP Routes - Direct MCP SDK Integration
+ *
+ * Handles MCP protocol requests without authentication or Durable Objects
+ */
 
-// Create MCP routes function that accepts mcpHandlers
-export function createMcpRoutes(mcpHandlers: any) {
-	const mcpRoutes = new Hono<{ Bindings: Env; Variables: Variables }>();
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import { createMcpServer } from "../mcp-server.js";
 
-// Streamable HTTP endpoint (matches /mcp and /mcp/*)
-mcpRoutes.all("/mcp/*", bearerAuth, async (c) => {
-	const props = c.get("props");
+// Singleton transport instance
+let transport: StreamableHTTPServerTransport | null = null;
 
-	// Create ExecutionContext with props
-	// The agents library's serve() handler will read ctx.props and pass it to the DO
-	// Using 'as any' here because ExecutionContext doesn't expose props in its type definition,
-	// but the agents library expects it at runtime
-	const ctx = c.executionCtx as any;
-	ctx.props = props;
+/**
+ * Get or create the MCP transport
+ * This creates a singleton transport that's shared across all requests
+ */
+export function getMcpTransport(): StreamableHTTPServerTransport {
+	if (transport) {
+		return transport;
+	}
 
-	// Forward request to MCP handler
-	const response = await mcpHandlers.streamableHTTP.fetch(
-		c.req.raw,
-		c.env,
-		ctx
-	);
+	// Get API key from environment
+	const apiKey = process.env.HEVY_API_KEY;
+	if (!apiKey) {
+		throw new Error("HEVY_API_KEY environment variable is required");
+	}
 
-	return response;
-});
+	// Create MCP server instance
+	const mcpServer = createMcpServer(apiKey);
 
-// Also handle /mcp without trailing path for initialization
-mcpRoutes.all("/mcp", bearerAuth, async (c) => {
-	const props = c.get("props");
-	const ctx = c.executionCtx as any;
-	ctx.props = props;
+	// Create transport for HTTP streaming (stateless mode)
+	transport = new StreamableHTTPServerTransport({
+		sessionIdGenerator: undefined, // Stateless mode for single-user deployment
+	});
 
-	const response = await mcpHandlers.streamableHTTP.fetch(
-		c.req.raw,
-		c.env,
-		ctx
-	);
+	// Connect server to transport
+	mcpServer.connect(transport).catch((error) => {
+		console.error("Failed to connect MCP server to transport:", error);
+	});
 
-	return response;
-});
-
-// Legacy SSE endpoint for backward compatibility (matches /sse and /sse/*)
-mcpRoutes.all("/sse/*", bearerAuth, async (c) => {
-	const props = c.get("props");
-	const ctx = c.executionCtx as any;
-	ctx.props = props;
-
-	return await mcpHandlers.sse.fetch(c.req.raw, c.env, ctx);
-});
-
-// Also handle /sse without trailing path
-mcpRoutes.all("/sse", bearerAuth, async (c) => {
-	const props = c.get("props");
-	const ctx = c.executionCtx as any;
-	ctx.props = props;
-
-	return await mcpHandlers.sse.fetch(c.req.raw, c.env, ctx);
-});
-
-	return mcpRoutes;
+	return transport;
 }

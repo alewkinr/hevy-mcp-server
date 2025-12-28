@@ -1,5 +1,6 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import { ZodError } from "zod";
+import { HevyApiError } from "../../src/lib/client.js";
 import {
 	formatHevyApiError,
 	formatValidationError,
@@ -7,22 +8,21 @@ import {
 	handleError,
 	type McpToolResponse,
 } from "../../src/lib/errors.js";
-import { HevyApiError } from "../../src/lib/client.js";
 import { ValidationError } from "../../src/lib/transforms.js";
 
 describe("Error Handling", () => {
 	describe("formatHevyApiError", () => {
 		it("should format 400 Bad Request errors", () => {
-			const error = new HevyApiError(
-				"Bad Request",
-				400,
-				{ error: "Invalid workout data" }
-			);
+			const error = new HevyApiError("Bad Request", 400, {
+				error: "Invalid workout data",
+			});
 			const result = formatHevyApiError(error);
 
 			expect(result.content[0].text).toContain("❌ Invalid request parameters");
 			expect(result.content[0].text).toContain("Invalid workout data");
-			expect(result.content[0].text).toContain("Check that all required parameters are provided");
+			expect(result.content[0].text).toContain(
+				"Check that all required parameters are provided",
+			);
 			expect(result.isError).toBe(true);
 		});
 
@@ -30,8 +30,10 @@ describe("Error Handling", () => {
 			const error = new HevyApiError("Unauthorized", 401);
 			const result = formatHevyApiError(error);
 
-		expect(result.content[0].text).toContain("❌ Unauthorized - Invalid API key");
-		expect(result.content[0].text).toContain("Verify your Hevy API key is configured at /setup");
+			expect(result.content[0].text).toContain("❌ Unauthorized - Invalid API key");
+			expect(result.content[0].text).toContain(
+				"Verify your Hevy API key is configured at /setup",
+			);
 			expect(result.isError).toBe(true);
 		});
 
@@ -72,16 +74,12 @@ describe("Error Handling", () => {
 		});
 
 		it("should handle error data with validation errors array", () => {
-			const error = new HevyApiError(
-				"Validation Failed",
-				400,
-				{
-					errors: [
-						{ field: "startTime", message: "Invalid date format" },
-						{ field: "exercises", message: "At least one exercise required" },
-					],
-				}
-			);
+			const error = new HevyApiError("Validation Failed", 400, {
+				errors: [
+					{ field: "startTime", message: "Invalid date format" },
+					{ field: "exercises", message: "At least one exercise required" },
+				],
+			});
 			const result = formatHevyApiError(error);
 
 			expect(result.content[0].text).toContain("**Validation Errors:**");
@@ -91,11 +89,7 @@ describe("Error Handling", () => {
 		});
 
 		it("should handle error data as plain string", () => {
-			const error = new HevyApiError(
-				"Server Error",
-				500,
-				"Database connection failed"
-			);
+			const error = new HevyApiError("Server Error", 500, "Database connection failed");
 			const result = formatHevyApiError(error);
 
 			expect(result.content[0].text).toContain("Database connection failed");
@@ -103,11 +97,9 @@ describe("Error Handling", () => {
 		});
 
 		it("should handle error data with error property", () => {
-			const error = new HevyApiError(
-				"Bad Request",
-				400,
-				{ error: "Missing required field: title" }
-			);
+			const error = new HevyApiError("Bad Request", 400, {
+				error: "Missing required field: title",
+			});
 			const result = formatHevyApiError(error);
 
 			expect(result.content[0].text).toContain("Missing required field: title");
@@ -115,11 +107,9 @@ describe("Error Handling", () => {
 		});
 
 		it("should handle error data with message property", () => {
-			const error = new HevyApiError(
-				"Bad Request",
-				400,
-				{ message: "Workout date must be in the past" }
-			);
+			const error = new HevyApiError("Bad Request", 400, {
+				message: "Workout date must be in the past",
+			});
 			const result = formatHevyApiError(error);
 
 			expect(result.content[0].text).toContain("Workout date must be in the past");
@@ -248,13 +238,15 @@ describe("Error Handling", () => {
 			const result = formatValidationErrorMessage(error);
 
 			expect(result.content[0].text).toContain("Page size cannot exceed 10, got 50");
-			expect(result.content[0].text).toContain("Check the maximum page size for this endpoint");
+			expect(result.content[0].text).toContain(
+				"Check the maximum page size for this endpoint",
+			);
 			expect(result.isError).toBe(true);
 		});
 
 		it("should format ISO 8601 date errors", () => {
 			const error = new ValidationError(
-				"startTime must be in ISO 8601 format (e.g., 2024-01-15T10:00:00Z)"
+				"startTime must be in ISO 8601 format (e.g., 2024-01-15T10:00:00Z)",
 			);
 			const result = formatValidationErrorMessage(error);
 
@@ -272,10 +264,14 @@ describe("Error Handling", () => {
 		});
 
 		it("should format RPE validation errors", () => {
-			const error = new ValidationError("RPE must be one of: 6, 7, 7.5, 8, 8.5, 9, 9.5, 10. Got 11");
+			const error = new ValidationError(
+				"RPE must be one of: 6, 7, 7.5, 8, 8.5, 9, 9.5, 10. Got 11",
+			);
 			const result = formatValidationErrorMessage(error);
 
-			expect(result.content[0].text).toContain("RPE must be one of: 6, 7, 7.5, 8, 8.5, 9, 9.5, 10");
+			expect(result.content[0].text).toContain(
+				"RPE must be one of: 6, 7, 7.5, 8, 8.5, 9, 9.5, 10",
+			);
 			expect(result.content[0].text).toContain("Use half-step increments");
 			expect(result.isError).toBe(true);
 		});
@@ -300,17 +296,21 @@ describe("Error Handling", () => {
 			const error = new ValidationError("Exercise 0, Set 1: weightKg cannot be negative");
 			const result = formatValidationErrorMessage(error);
 
-			expect(result.content[0].text).toContain("Ensure all numeric values are positive or zero");
+			expect(result.content[0].text).toContain(
+				"Ensure all numeric values are positive or zero",
+			);
 			expect(result.isError).toBe(true);
 		});
 
 		it("should format rep range errors", () => {
 			const error = new ValidationError(
-				"Exercise 0, Set 0: repRange.start cannot be greater than repRange.end"
+				"Exercise 0, Set 0: repRange.start cannot be greater than repRange.end",
 			);
 			const result = formatValidationErrorMessage(error);
 
-			expect(result.content[0].text).toContain("Ensure rep range start is less than or equal to end");
+			expect(result.content[0].text).toContain(
+				"Ensure rep range start is less than or equal to end",
+			);
 			expect(result.isError).toBe(true);
 		});
 
@@ -326,7 +326,9 @@ describe("Error Handling", () => {
 			const error = new ValidationError("Some unknown validation error");
 			const result = formatValidationErrorMessage(error);
 
-			expect(result.content[0].text).toContain("Review the error message for specific details");
+			expect(result.content[0].text).toContain(
+				"Review the error message for specific details",
+			);
 			expect(result.isError).toBe(true);
 		});
 	});
@@ -382,7 +384,9 @@ describe("Error Handling", () => {
 
 		it("should handle null and undefined", () => {
 			expect(handleError(null).content[0].text).toContain("❌ An unknown error occurred");
-			expect(handleError(undefined).content[0].text).toContain("❌ An unknown error occurred");
+			expect(handleError(undefined).content[0].text).toContain(
+				"❌ An unknown error occurred",
+			);
 		});
 	});
 
@@ -405,9 +409,8 @@ describe("Error Handling", () => {
 			const result: McpToolResponse = formatHevyApiError(error);
 
 			// This should compile without errors due to index signature
-			const dynamicProp: unknown = result["someProperty"];
+			const dynamicProp: unknown = result.someProperty;
 			expect(dynamicProp).toBeUndefined();
 		});
 	});
 });
-
